@@ -96,8 +96,7 @@ def main():
     """Основная логика работы бота."""
     check_tokens()
     bot = Bot(token=TELEGRAM_TOKEN)
-    # timestamp = int(time.time())
-    timestamp = 1650000
+    timestamp = int(time.time())
     last_status = ''
 
     while True:
