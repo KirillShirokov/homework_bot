@@ -118,7 +118,10 @@ def main():
                     logger.error(f'ERROR MESSAGE {error}')
             else:
                 message = 'Статус работы не изменился'
-                send_message(bot, message)
+                try:
+                    send_message(bot, message)
+                except Exception as error:
+                    logger.error(f'ERROR MESSAGE {error}')
         except Exception as error:
             logger.critical(f'Сбой в работе программы: {error}')
         finally:
