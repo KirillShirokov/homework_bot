@@ -124,11 +124,12 @@ def main():
             check_response(response)
             logger.info('Запрос проверен.')
             homeworks = response.get('homeworks')
-            if homeworks == 0:
-                logger.info('Список пуст.')
-            homework, *_ = homeworks
-            status = parse_status(homework)
-            logger.info(f'Статус {status} получен.')
+            if homeworks:
+                homework, *_ = homeworks
+                status = parse_status(homework)
+                logger.info(f'Статус {status} получен.')
+            else:
+                logger.info('Список пуст.')            
             if status != last_status:
                 message = status
             else:
