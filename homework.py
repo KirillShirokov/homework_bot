@@ -129,7 +129,7 @@ def main():
                 status = parse_status(homework)
                 logger.info(f'Статус {status} получен.')
             else:
-                logger.info('Список пуст.')            
+                logger.info('Список пуст.')
             if status != last_status:
                 message = status
             else:
