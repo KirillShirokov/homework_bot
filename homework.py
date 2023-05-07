@@ -46,11 +46,18 @@ def my_error(error):
 
 def check_tokens():
     """Проверяется доступность переменных окружения."""
-    tokens = [PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID]
-    for token in tokens:
-        if not token:
-            logger.critical('Недоступны переменные окружения.')
-            sys.exit('Чего-то не хватает')
+    tokens = {
+        'practicum_token': PRACTICUM_TOKEN,
+        'telegram_token': TELEGRAM_TOKEN,
+        'telegram_chat_id': TELEGRAM_CHAT_ID}
+    token_flag = False
+    for key, value in tokens.items():
+        if not value:
+            token_flag = True
+            message = f'Недоступна переменная окружения {key}.'
+            logger.critical(message)
+    if token_flag:
+        sys.exit(message)
 
 
 def send_message(bot, message):
@@ -74,28 +81,27 @@ def get_api_answer(timestamp):
 
 def check_response(response):
     """Проверяется ответ API на соответствие документации."""
+    message_non_dict = 'Тип данных не является словарем.'
+    message_non_list = 'Тип данных не является списком.'
     if not isinstance(response, dict):
-        logging.error('Тип данных не содержит словарь.')
-        raise TypeError('Тип данных не содержит словарь.')
+        logging.error(message_non_dict)
+        raise TypeError(message_non_dict)
     homeworks = response.get('homeworks')
     if not isinstance(homeworks, list):
-        logging.error('Тип данных не содержит список.')
-        raise TypeError('Тип данных не содержит список.')
-    first, *_ = homeworks
-    if not isinstance(first, dict):
-        logging.error('Тип данных не содержит словарь.')
-        raise TypeError('Тип данных не содержит словарь.')
+        logging.error(message_non_list)
+        raise TypeError(message_non_list)
 
 
 def parse_status(homework):
     """Извлекается статус из конкретной д/р."""
+    check_keys = ['homework_name', 'status']
+    for check_key in check_keys:
+        if check_key not in homework:
+            message = 'Отсутвуют ключи для словаря.'
+            logger.critical(message)
+            raise KeyError(message)
     homework_name = homework.get('homework_name')
     homework_status = homework.get('status')
-    check_keys = [homework_name, homework_status]
-    for check_key in check_keys:
-        if not check_key:
-            logger.critical('Отсутвуют ключи для словаря.')
-            raise KeyError('Отсутвуют ключи для словаря.')
     if homework_status not in HOMEWORK_VERDICTS:
         message = f'Неизвестный статус: {homework_status}'
         raise KeyError(message)
@@ -118,7 +124,7 @@ def main():
             check_response(response)
             logger.info('Запрос проверен.')
             homeworks = response.get('homeworks')
-            if homeworks is None:
+            if homeworks == 0:
                 logger.info('Список пуст.')
             homework, *_ = homeworks
             status = parse_status(homework)
